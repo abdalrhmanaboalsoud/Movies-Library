@@ -20,27 +20,36 @@ git clone "<git@github.com>:abdalrhmanaboalsoud/Movies-Library.git".
 2. Navigate to the project directory:
 cd Movies-Library
 
-3. Create a new branch called Lab11
+3. Create a new branch called Lab11.
 
 5. Create basic file structure (server.js, .gitignore, .eslintrc.json ).
 
 6. Install the required packages for this lab: npm install.
 
-7. Start the server: node server.js
+7. Start the server: node server.js.
 
 8. Access the application by opening a web browser and navigating to `http://localhost:3002`.
 
 ## Project Features
 
+## Project Features
 The Movies Library app includes the following features:
-
 - Display movie titles, poster images, and brief overviews.
-- Handle HTTP GET requests for home page and favorite page endpoints.
-- Implement error handling for server errors (status 500) and page not found errors (status 404).
+- Handle HTTP GET requests for various endpoints, including favorites, trending movies, trending TV shows, and searching for movies.
+- Fetch data from external APIs such as The Movie Database API using Axios.
+- Implement error handling middleware to respond to server errors (status 500) and page not found errors (status 404).
 - Provide clear documentation in the README file for project setup and usage.
 
-## License
+## Changes in Version 2.0.0
 
+![WRRC Image](./WRRC2.jpg)
+- Added new endpoints for fetching trending TV shows, searching for movies, and retrieving TV show genres.
+- Implemented constructors to shape data received from external APIs into custom objects.
+- Updated error handling middleware to handle additional error scenarios and provide appropriate error messages.
+- Refactored code for improved readability and maintainability.
+- Updated documentation in the README file to reflect changes and provide clear instructions for project setup and usage.
+
+## License
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
-This project utilizes Express.js for server-side development and provides a structured approach for handling HTTP requests and responses. It aims to offer users an intuitive and seamless experience while exploring movie details.
+This project utilizes Express.js for server-side development and Axios for making HTTP requests. It aims to offer users an intuitive and seamless experience while exploring movie details.
