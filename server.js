@@ -1,14 +1,24 @@
 //1. require express framework 
 const express = require('express');
+const app = express();
+
 const axios = require('axios');
-// const cors = require('cors');
+
+const bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
 require('dotenv').config();
 const port = process.env.PORT;
 const apiKey = process.env.API_KEY;
 const moviesData = require('./Movie Data/data.json')
 
-// 2. invoke express
-const app = express();
+const { Client } = require('pg')
+//postgres://username:password@localhost:5432/darabasename
+const url =`postgres://abdalrhman:0000@localhost:5432/lap13`
+const client = new Client(url);
+
+
 
 //3. Routes
 app.get('/favoritePage', favoritePageHandler);
@@ -17,7 +27,8 @@ app.get('/trending', trendingPageHandler);
 app.get('/searchMovie', searchHandler);
 app.get('/trendingTvShows', trendTvShows);
 app.get('/tvgenres', tvShowsGenres);
-
+app.post('/addMovie', addMovieHandler);
+app.get('/getMovie', getMovieHandler);
 //4. functions 
 function favoritePageHandler(req, res) {
     res.send("Welcome to Favorite Page");
@@ -86,6 +97,30 @@ function tvShowsGenres(req, res) {
             res.status(500).send('Internal Server Error');
         })
 }
+function addMovieHandler(req, res){
+    const {movie_id ,movie_title, comment} = req.body;
+    const sql = `INSERT INTO movie (movie_id, movie_title, comment) VALUES ($1, $2, $3) RETURNING *`;
+    const safeValues = [movie_id,movie_title,comment];
+    client.query(sql, safeValues).then(result => {
+        // console.log(result.rows);
+        res.status(201).send(result.rows);
+    })
+    .catch(error => {
+            console.error(error);
+            res.status(500).send('Internal Server Error');
+        })
+
+};
+function getMovieHandler(req, res){
+    const sql = `SELECT * FROM movie`;  
+    client.query(sql).then(result => {
+        res.json(result.rows);
+    })
+    .catch(error => {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    })
+}
 // Constructors
 function Trend(id, title, release_date, poster_path, overview) {
     this.id = id;
@@ -123,6 +158,8 @@ app.use((req, res, next) => {
 
 
 //3. run server make it lis
-app.listen(port, () => {
-    console.log(`my app is running and  listening on port ${port}`)
-})
+client.connect().then(() => {
+    app.listen(port, () => {
+        console.log(`my app is running and  listening on port ${port}`)
+    })  
+}).catch()
