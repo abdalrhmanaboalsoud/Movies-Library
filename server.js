@@ -15,7 +15,7 @@ const moviesData = require('./Movie Data/data.json')
 
 const { Client } = require('pg')
 //postgres://username:password@localhost:5432/darabasename
-const url =`postgres://abdalrhman:0000@localhost:5432/lap13`
+const url = `postgres://abdalrhman:0000@localhost:5432/lap13`
 const client = new Client(url);
 
 
@@ -29,6 +29,9 @@ app.get('/trendingTvShows', trendTvShows);
 app.get('/tvgenres', tvShowsGenres);
 app.post('/addMovie', addMovieHandler);
 app.get('/getMovie', getMovieHandler);
+app.put('/updateComment/:movieID', updateCommentHandler);
+app.delete('/deleteMovie/:movieID', deletMovieHandler);
+app.get('/getSpecificMovie/:movieID', getSpecificMovieHandler);
 //4. functions 
 function favoritePageHandler(req, res) {
     res.send("Welcome to Favorite Page");
@@ -70,6 +73,7 @@ function trendTvShows(req, res) {
             res.status(500).send('Internal Server Error');
         })
 }
+//seacrh function by query
 function searchHandler(req, res) {
     let reqMovie = req.query.title;
     let url = `https://api.themoviedb.org/3/search/movie?query=${reqMovie}&api_key=${apiKey}`;
@@ -97,29 +101,60 @@ function tvShowsGenres(req, res) {
             res.status(500).send('Internal Server Error');
         })
 }
-function addMovieHandler(req, res){
-    const {movie_id ,movie_title, comment} = req.body;
-    const sql = `INSERT INTO movie (movie_id, movie_title, comment) VALUES ($1, $2, $3) RETURNING *`;
-    const safeValues = [movie_id,movie_title,comment];
+function addMovieHandler(req, res) {
+    const { movie_title, comment } = req.body;
+    const sql = `INSERT INTO movie ( movie_title, comment) VALUES ($1, $2) RETURNING *`;
+    const safeValues = [movie_title, comment];
     client.query(sql, safeValues).then(result => {
         // console.log(result.rows);
         res.status(201).send(result.rows);
     })
-    .catch(error => {
+        .catch(error => {
             console.error(error);
             res.status(500).send('Internal Server Error');
         })
 
 };
-function getMovieHandler(req, res){
-    const sql = `SELECT * FROM movie`;  
+function getMovieHandler(req, res) {
+    const sql = `SELECT * FROM movie`;
     client.query(sql).then(result => {
         res.json(result.rows);
     })
-    .catch(error => {
+        .catch(error => {
+            console.error(error);
+            res.status(500).send('Internal Server Error');
+        })
+}
+function updateCommentHandler(req, res) {
+    let commentD = req.params.movieID;
+    let { movie_title, comment } = req.body;
+    const sql = `UPDATE movie SET movie_title = $1, comment = $2 WHERE movie_id = $3 RETURNING *`;
+    const values = [movie_title, comment, commentD];
+    client.query(sql, values).then(result => {
+        res.json(result.rows);
+    }).catch(error => {
         console.error(error);
-        res.status(500).send('Internal Server Error');
     })
+};
+function deletMovieHandler(req, res) {
+    let { movie_id } = req.params;
+    const sql = `DELETE FROM movie WHERE movie_id = $1`;
+    let values = [movie_id];
+    client.query(sql, values).then(result => {
+        res.status(204).send("successfuly deleted");
+    }).catch(error => {
+        console.error(error);
+    })
+}
+function getSpecificMovieHandler(req, res) {
+    let {movie_id} = req.params;
+    const sql = `SELECT * FROM movie WHERE movie_id = $1`;
+    let values = [movie_id];
+    client.query(sql, values)
+        .then(result => {
+            res.json(result.rows);
+        })
+        .catch();
 }
 // Constructors
 function Trend(id, title, release_date, poster_path, overview) {
@@ -161,5 +196,5 @@ app.use((req, res, next) => {
 client.connect().then(() => {
     app.listen(port, () => {
         console.log(`my app is running and  listening on port ${port}`)
-    })  
+    })
 }).catch()
