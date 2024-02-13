@@ -137,19 +137,21 @@ function updateCommentHandler(req, res) {
     })
 };
 function deletMovieHandler(req, res) {
-    let { movie_id } = req.params;
+    let { movieID } = req.params;
     const sql = `DELETE FROM movie WHERE movie_id = $1`;
-    let values = [movie_id];
+    let values = [movieID];
+    console.log(movieID);
     client.query(sql, values).then(result => {
         res.status(204).send("successfuly deleted");
+
     }).catch(error => {
         console.error(error);
     })
 }
 function getSpecificMovieHandler(req, res) {
-    let {movie_id} = req.params;
+    let {movieID} = req.params;
     const sql = `SELECT * FROM movie WHERE movie_id = $1`;
-    let values = [movie_id];
+    let values = [movieID];
     client.query(sql, values)
         .then(result => {
             res.json(result.rows);
