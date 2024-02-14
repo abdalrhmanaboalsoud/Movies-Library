@@ -15,7 +15,7 @@ const moviesData = require('./Movie Data/data.json')
 
 const { Client } = require('pg')
 //postgres://username:password@localhost:5432/darabasename
-const url = `postgres://abdalrhman:0000@localhost:5432/lap13`
+const url = process.env.DATABASE_URL;
 const client = new Client(url);
 
 
@@ -106,7 +106,6 @@ function addMovieHandler(req, res) {
     const sql = `INSERT INTO movie ( movie_title, comment) VALUES ($1, $2) RETURNING *`;
     const safeValues = [movie_title, comment];
     client.query(sql, safeValues).then(result => {
-        // console.log(result.rows);
         res.status(201).send(result.rows);
     })
         .catch(error => {
@@ -131,7 +130,9 @@ function updateCommentHandler(req, res) {
     const sql = `UPDATE movie SET movie_title = $1, comment = $2 WHERE movie_id = $3 RETURNING *`;
     const values = [movie_title, comment, commentD];
     client.query(sql, values).then(result => {
+
         res.json(result.rows);
+
     }).catch(error => {
         console.error(error);
     })
@@ -149,7 +150,7 @@ function deletMovieHandler(req, res) {
     })
 }
 function getSpecificMovieHandler(req, res) {
-    let {movieID} = req.params;
+    let { movieID } = req.params;
     const sql = `SELECT * FROM movie WHERE movie_id = $1`;
     let values = [movieID];
     client.query(sql, values)
