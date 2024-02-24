@@ -1,7 +1,11 @@
 //1. require express framework 
 const express = require('express')
-// 2. invoke express
+// 2. invoke express and cors
 const app = express()
+
+const cors = require('cors');
+app.use(cors());
+
 const port = 3002
 const moviesData = require('./Movie Data/data.json')
 
