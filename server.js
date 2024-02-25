@@ -1,7 +1,8 @@
 //1. require express framework 
 const express = require('express');
 const app = express();
-
+const cors = require('cors');
+app.use(cors());
 const axios = require('axios');
 
 const bodyParser = require('body-parser')
