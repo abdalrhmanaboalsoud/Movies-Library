@@ -103,9 +103,9 @@ function tvShowsGenres(req, res) {
         })
 }
 function addMovieHandler(req, res) {
-    const { movie_title, comment } = req.body;
-    const sql = `INSERT INTO movie ( movie_title, comment) VALUES ($1, $2) RETURNING *`;
-    const safeValues = [movie_title, comment];
+    const { title, release_date, poster_path,overview, comment } = req.body;
+    const sql = `INSERT INTO movie (title, release_date, poster_path,overview, comment) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
+    const safeValues = [title, release_date, poster_path,overview, comment];
     client.query(sql, safeValues).then(result => {
         res.status(201).send(result.rows);
     })
@@ -127,9 +127,9 @@ function getMovieHandler(req, res) {
 }
 function updateCommentHandler(req, res) {
     let commentD = req.params.movieID;
-    let { movie_title, comment } = req.body;
-    const sql = `UPDATE movie SET movie_title = $1, comment = $2 WHERE movie_id = $3 RETURNING *`;
-    const values = [movie_title, comment, commentD];
+    let { title, release_date, poster_path,overview, comment } = req.body;
+    const sql = `UPDATE movie SET title = $1,  release_date = $2, poster_path = $3, overview = $4, comment = $5 WHERE id = $6 RETURNING *`;
+    const values = [title, release_date, poster_path,overview, comment, commentD];
     client.query(sql, values).then(result => {
 
         res.json(result.rows);
@@ -140,10 +140,13 @@ function updateCommentHandler(req, res) {
 };
 function deletMovieHandler(req, res) {
     let { movieID } = req.params;
-    const sql = `DELETE FROM movie WHERE movie_id = $1`;
+    const sql = `DELETE FROM movie WHERE id = $1`;
     let values = [movieID];
     console.log(movieID);
-    client.query(sql, values).then(result => {
+    client.query(sql, values).then(data =>{})
+    client.query(sql, values)
+    .then(result => {
+        
         res.status(204).send("successfuly deleted");
 
     }).catch(error => {
@@ -152,7 +155,7 @@ function deletMovieHandler(req, res) {
 }
 function getSpecificMovieHandler(req, res) {
     let { movieID } = req.params;
-    const sql = `SELECT * FROM movie WHERE movie_id = $1`;
+    const sql = `SELECT * FROM movie WHERE id = $1`;
     let values = [movieID];
     client.query(sql, values)
         .then(result => {
